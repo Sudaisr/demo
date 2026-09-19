@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="School management dashboard for students, fees, attendance, teachers and academic records.">
+  <title>EduCore School Management</title>
+  <link rel="stylesheet" href="style.css">
+
+<script>
+  // Nitron Multi-Page Support
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (a && a.href && (a.origin === window.location.origin || !a.href.startsWith('http'))) {
+      e.preventDefault();
+      window.location.href = a.href;
+    }
+  });
+</script>
+</head>
+<body class="app-locked">
+  <section class="login-screen" id="loginScreen">
+    <div class="login-grid" aria-hidden="true"></div>
+    <div class="login-shape shape-one"></div>
+    <div class="login-shape shape-two"></div>
+    <div class="login-orb orb-one" aria-hidden="true">✓</div>
+    <div class="login-orb orb-two" aria-hidden="true">A+</div>
+    <div class="login-orb orb-three" aria-hidden="true">₨</div>
+    <form class="login-card" id="ownerLoginForm">
+      <div class="login-brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48"><path d="M5 17.5 24 8l19 9.5L24 27 5 17.5Z"/><path d="M12 23v10c7 5 17 5 24 0V23"/><path d="M42 19v13"/></svg>
+      </div>
+      <span class="login-kicker">OWNER ACCESS</span>
+      <h1 id="loginSchoolName">EduCore School</h1>
+      <p>Sign in to manage students, fees, attendance and staff records.</p>
+      <label class="login-field"><span>Username</span><input id="loginUsername" autocomplete="username" required placeholder="Enter username"></label>
+      <label class="login-field"><span>PIN</span><input id="loginPin" type="password" inputmode="numeric" autocomplete="current-password" required placeholder="Enter owner PIN"></label>
+      <div class="login-error" id="loginError" role="alert"></div>
+      <button class="login-button" type="submit"><span>Sign in securely</span><b aria-hidden="true">→</b></button>
+      <div class="offline-badge"><span></span> Private offline app • No internet required</div>
+    </form>
+  </section>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48"><path d="M5 17.5 24 8l19 9.5L24 27 5 17.5Z"/><path d="M12 23v10c7 5 17 5 24 0V23"/><path d="M42 19v13"/></svg>
+        </div>
+        <div>
+          <strong id="brandSchoolName">EduCore</strong>
+          <span>School Management</span>
+        </div>
+      </div>
+
+      <nav class="side-nav" aria-label="Main navigation">
+        <button class="nav-link active" data-page="dashboard"><span class="nav-icon">▦</span><span>Dashboard</span></button>
+        <p class="nav-label">Students</p>
+        <button class="nav-link" data-page="students"><span class="nav-icon">♙</span><span>Students</span></button>
+        <button class="nav-link" data-page="admissions"><span class="nav-icon">＋</span><span>Admissions</span></button>
+        <button class="nav-link" data-page="student-attendance"><span class="nav-icon">✓</span><span>Attendance</span></button>
+        <button class="nav-link" data-page="fees"><span class="nav-icon">₨</span><span>Fees & Dues</span></button>
+        <button class="nav-link" data-page="promotions"><span class="nav-icon">↑</span><span>Promotions</span></button>
+        <p class="nav-label">Staff</p>
+        <button class="nav-link" data-page="teachers"><span class="nav-icon">♧</span><span>Teachers</span></button>
+        <button class="nav-link" data-page="teacher-attendance"><span class="nav-icon">◷</span><span>Staff Attendance</span></button>
+        <button class="nav-link" data-page="salaries"><span class="nav-icon">▣</span><span>Salaries</span></button>
+        <p class="nav-label">Academic</p>
+        <button class="nav-link" data-page="books"><span class="nav-icon">▤</span><span>Books & Subjects</span></button>
+        <button class="nav-link" data-page="meetings"><span class="nav-icon">◉</span><span>Meetings</span></button>
+        <button class="nav-link" data-page="reports"><span class="nav-icon">⌁</span><span>Reports</span></button>
+        <button class="nav-link" data-page="settings"><span class="nav-icon">⚙</span><span>Settings & Backup</span></button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="school-year"><span>Academic year</span><strong id="academicYearLabel">2026–27</strong></div>
+        <button class="nav-link" id="logoutButton"><span class="nav-icon">⇥</span><span>Lock app</span></button>
+        <button class="nav-link" id="resetDemo"><span class="nav-icon">×</span><span>Clear all data</span></button>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="icon-button menu-button" id="menuButton" aria-label="Open menu">☰</button>
+        <div class="page-heading">
+          <h1 id="pageTitle">Dashboard</h1>
+          <p id="pageSubtitle">A complete view of your school today.</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-button global-search-button" id="openStudentSearch" type="button" aria-label="Search students">⌕</button>
+          <button class="icon-button notification-button" aria-label="Notifications">♢<span class="notification-dot"></span></button>
+          <div class="admin-profile">
+            <div class="avatar">AR</div>
+            <div><strong id="adminNameLabel">Admin</strong><span>Owner account</span></div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="page active" id="page-dashboard">
+          <div class="welcome-card">
+            <div>
+              <div class="welcome-meta"><span class="eyebrow" id="welcomeDate">WEDNESDAY • 15 JULY 2026</span><span class="live-clock" id="welcomeClock">09:00:00 PM</span></div>
+              <h2 id="welcomeTitle">Good morning, Admin!</h2>
+              <p>Here is today’s overview of students, fees, attendance and staff.</p>
+              <button class="button button-light" id="newAdmissionButton" data-go="admissions">+ New admission</button>
+            </div>
+            <div class="welcome-art" aria-hidden="true">
+              <div class="art-circle"></div>
+              <svg viewBox="0 0 250 160"><path d="M32 124h186v10H32z"/><path d="m44 71 81-40 81 40-81 41z"/><path d="M63 87v37h124V87l-62 31z"/><path d="M197 75v42"/><circle cx="197" cy="121" r="7"/></svg>
+            </div>
+          </div>
+
+          <div class="stats-grid" id="dashboardStats"></div>
+
+          <div class="dashboard-grid">
+            <article class="card chart-card analytics-card">
+              <div class="card-header">
+                <div><h3>Live school analytics</h3><p>Green: present/profit • Red: absent/loss • Yellow: leave/reminder</p></div>
+                <span class="status-pill success" id="overallAttendance">0% present</span>
+              </div>
+              <div class="tri-analytics" id="analysisCharts"></div>
+            </article>
+
+            <article class="card quick-actions-card">
+              <div class="card-header"><div><h3>Quick actions</h3><p>Common daily tasks</p></div></div>
+              <div class="quick-actions">
+                <button data-go="student-attendance"><span class="quick-icon teal">✓</span><strong>Take attendance</strong><small>Mark class attendance</small></button>
+                <button data-go="fees"><span class="quick-icon amber">₨</span><strong>Collect fee</strong><small>Record a payment</small></button>
+                <button data-go="admissions"><span class="quick-icon blue">＋</span><strong>Add student</strong><small>New admission form</small></button>
+                <button data-go="meetings"><span class="quick-icon purple">◉</span><strong>Plan meeting</strong><small>Schedule teachers</small></button>
+              </div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid lower-grid">
+            <article class="card">
+              <div class="card-header"><div><h3>Recent admissions</h3><p>Latest students registered</p></div><button class="text-button" data-go="students">View all →</button></div>
+              <div class="table-wrap compact"><table><thead><tr><th>Student</th><th>Class</th><th>Roll no.</th><th>Joined</th></tr></thead><tbody id="recentAdmissions"></tbody></table></div>
+            </article>
+            <article class="card">
+              <div class="card-header"><div><h3>Upcoming meetings</h3><p>Teacher meetings and reminders</p></div><button class="text-button" data-go="meetings">View all →</button></div>
+              <div class="meeting-list" id="dashboardMeetings"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="page" id="page-students">
+          <div class="section-toolbar">
+            <div class="filter-row">
+              <label class="search-control"><span>⌕</span><input id="studentSearch" type="search" placeholder="Search name, roll number or parent"></label>
+              <select id="studentClassFilter" aria-label="Filter by class"></select>
+              <select id="studentSectionFilter" aria-label="Filter by section"><option value="">All sections</option><option>A</option><option>B</option><option>C</option></select>
+            </div>
+            <button class="button button-primary" data-go="admissions">+ Add student</button>
+          </div>
+          <div class="card">
+            <div class="card-header table-title"><div><h3>Student directory</h3><p id="studentCountLabel">0 students</p></div><button class="button button-secondary button-small" id="exportStudents">Export CSV</button></div>
+            <div class="table-wrap"><table><thead><tr><th>Student</th><th>Roll no.</th><th>Class</th><th>Parent / Phone</th><th>Monthly fee</th><th>Status</th><th>Actions</th></tr></thead><tbody id="studentsTable"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-admissions">
+          <div class="form-layout">
+            <form class="card form-card" id="admissionForm">
+              <div class="card-header"><div><h3 id="admissionFormTitle">New student admission</h3><p>Enter the student’s personal and academic information.</p></div><span class="step-badge">Registration</span></div>
+              <input type="hidden" id="studentEditId">
+              <div class="form-section-title"><span>1</span><div><strong>Student details</strong><small>Only the information needed for admission</small></div></div>
+              <div class="form-grid">
+                <label class="field field-wide"><span>Full name *</span><input id="studentName" required placeholder="e.g. Ayan Khan"></label>
+                <label class="field"><span>Gender *</span><select id="studentGender" required><option value="">Select</option><option>Male</option><option>Female</option></select></label>
+                <label class="field"><span>Date of birth *</span><input id="studentDob" type="date" required></label>
+              </div>
+              <div class="form-section-title"><span>2</span><div><strong>Academic details</strong><small>Class and section placement</small></div></div>
+              <div class="form-grid">
+                <label class="field"><span>Class *</span><select id="studentClass" required></select></label>
+                <label class="field"><span>Section *</span><select id="studentSection" required><option>A</option><option>B</option><option>C</option></select></label>
+                <div class="auto-roll-note field-full"><span>Auto roll number</span><strong id="autoRollPreview">Created automatically after saving</strong></div>
+              </div>
+              <div class="form-section-title"><span>3</span><div><strong>Father details</strong><small>WhatsApp contact for direct communication</small></div></div>
+              <div class="form-grid">
+                <label class="field"><span>Father’s name *</span><input id="studentFather" required placeholder="Father’s name"></label>
+                <label class="field"><span>Father’s WhatsApp number *</span><input id="studentPhone" inputmode="tel" required placeholder="03XX XXXXXXX"></label>
+              </div>
+              <div class="form-actions"><button type="button" class="button button-secondary" id="clearAdmission">Clear</button><button class="button button-primary" type="submit">Save student record</button></div>
+            </form>
+            <aside class="card side-help-card">
+              <div class="help-icon">✓</div>
+              <h3>Admission checklist</h3>
+              <p>Complete all required fields before saving the record.</p>
+              <ul class="check-list"><li>Student and father’s names</li><li>Gender and date of birth</li><li>Class and section</li><li>Father’s active WhatsApp number</li></ul>
+              <div class="info-box"><strong>Classes available</strong><span>KG through Grade 10</span><span>Sections A, B and C</span></div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="page" id="page-student-attendance">
+          <div class="card attendance-toolbar">
+            <div class="filter-row">
+              <label class="field inline-field"><span>Date</span><input id="attendanceDate" type="date"></label>
+              <label class="field inline-field"><span>Class</span><select id="attendanceClass"></select></label>
+              <label class="field inline-field"><span>Section</span><select id="attendanceSection"><option>A</option><option>B</option><option>C</option></select></label>
+              <button class="button button-primary" id="loadAttendance">Load students</button>
+            </div>
+          </div>
+          <div class="attendance-summary" id="attendanceSummary"></div>
+          <div class="card">
+            <div class="card-header table-title"><div><h3>Student attendance register</h3><p>Choose a status for each student.</p></div><div class="button-row"><button class="button button-secondary button-small" id="markAllPresent">Mark all present</button><button class="button button-primary button-small" id="saveAttendance">Save attendance</button></div></div>
+            <div class="table-wrap"><table><thead><tr><th>Roll no.</th><th>Student</th><th>Class</th><th>Attendance status</th></tr></thead><tbody id="attendanceTable"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-fees">
+          <div class="stats-grid four" id="feeStats"></div>
+          <div class="split-grid">
+            <form class="card form-card" id="feeForm">
+              <div class="card-header"><div><h3>Collect student fee</h3><p>Record a payment and update dues.</p></div><span class="step-badge amber-badge">Receipt</span></div>
+              <div class="form-grid single">
+                <label class="field"><span>Select student *</span><select id="feeStudent" required></select></label>
+                <div class="selected-student-info" id="feeStudentInfo"><span>Select a student to see fee details.</span></div>
+                <label class="field"><span>Fee month *</span><input id="feeMonth" type="month" required></label>
+                <label class="field"><span>Fee charged for month (PKR) *</span><input id="feeCharge" type="number" min="1" required></label>
+                <label class="field"><span>Amount paid (PKR) *</span><input id="feeAmount" type="number" min="1" required></label>
+                <label class="field"><span>Payment date *</span><input id="feePaymentDate" type="date" required></label>
+                <label class="field"><span>Payment method</span><select id="feeMethod"><option>Cash</option><option>Bank transfer</option><option>EasyPaisa</option><option>JazzCash</option></select></label>
+                <label class="field"><span>Note</span><input id="feeNote" placeholder="Optional note"></label>
+              </div>
+              <div class="form-actions"><button class="button button-primary" type="submit">Record fee & create receipt</button></div>
+            </form>
+            <div class="card">
+              <div class="card-header"><div><h3>Fee records & dues</h3><p>Monthly payment status for all students.</p></div><div class="button-row"><input class="month-filter" id="feeFilterMonth" type="month"><button class="button button-secondary button-small" id="printDues">Print dues</button></div></div>
+              <div class="table-wrap"><table><thead><tr><th>Student</th><th>Class</th><th>Monthly fee</th><th>Paid</th><th>Due</th><th>Status</th></tr></thead><tbody id="feesTable"></tbody></table></div>
+            </div>
+          </div>
+          <div class="card receipt-history-card">
+            <div class="card-header"><div><h3>Recent fee receipts</h3><p>Open any receipt to save it as PDF or print it.</p></div></div>
+            <div class="table-wrap"><table><thead><tr><th>Receipt</th><th>Student</th><th>Month</th><th>Paid</th><th>Date</th><th>Action</th></tr></thead><tbody id="receiptsTable"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-promotions">
+          <div class="card promotion-card">
+            <div class="card-header"><div><h3>Promote students</h3><p>Move selected students to their next class and section.</p></div><span class="step-badge purple-badge">Academic year 2026–27</span></div>
+            <div class="promotion-controls">
+              <div class="promotion-group"><span>From</span><select id="promotionFromClass"></select><select id="promotionFromSection"><option>A</option><option>B</option><option>C</option></select></div>
+              <div class="promotion-arrow">→</div>
+              <div class="promotion-group"><span>Promote to</span><select id="promotionToClass"></select><select id="promotionToSection"><option>A</option><option>B</option><option>C</option></select></div>
+              <button class="button button-secondary" id="loadPromotion">Load students</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header table-title"><div><h3>Eligible students</h3><p id="promotionCount">Select a class to load students.</p></div><button class="button button-primary" id="promoteSelected">Promote selected</button></div>
+            <div class="table-wrap"><table><thead><tr><th><input id="selectAllPromotion" type="checkbox" aria-label="Select all students"></th><th>Roll no.</th><th>Student</th><th>Current class</th><th>Fee status</th></tr></thead><tbody id="promotionTable"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-teachers">
+          <div class="section-toolbar">
+            <label class="search-control"><span>⌕</span><input id="teacherSearch" type="search" placeholder="Search teacher or subject"></label>
+            <button class="button button-primary" id="addTeacherButton">+ Add teacher</button>
+          </div>
+          <div class="teacher-grid" id="teacherGrid"></div>
+        </section>
+
+        <section class="page" id="page-teacher-attendance">
+          <div class="card attendance-toolbar">
+            <div class="filter-row"><label class="field inline-field"><span>Date</span><input id="teacherAttendanceDate" type="date"></label><button class="button button-primary" id="loadTeacherAttendance">Load staff</button></div>
+          </div>
+          <div class="attendance-summary" id="teacherAttendanceSummary"></div>
+          <div class="card">
+            <div class="card-header table-title"><div><h3>Teacher attendance register</h3><p>Daily staff attendance and arrival status.</p></div><div class="button-row"><button class="button button-secondary button-small" id="markAllTeachersPresent">Mark all present</button><button class="button button-primary button-small" id="saveTeacherAttendance">Save attendance</button></div></div>
+            <div class="table-wrap"><table><thead><tr><th>Teacher</th><th>Subject</th><th>Phone</th><th>Attendance status</th></tr></thead><tbody id="teacherAttendanceTable"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-salaries">
+          <div class="stats-grid four" id="salaryStats"></div>
+          <div class="split-grid salary-layout">
+            <form class="card form-card" id="salaryForm">
+              <div class="card-header"><div><h3>Pay teacher salary</h3><p>Record monthly salary payment.</p></div><span class="step-badge">Payroll</span></div>
+              <div class="form-grid single">
+                <label class="field"><span>Teacher *</span><select id="salaryTeacher" required></select></label>
+                <label class="field"><span>Salary month *</span><input id="salaryMonth" type="month" required></label>
+                <label class="field"><span>Amount (PKR) *</span><input id="salaryAmount" type="number" min="1" required></label>
+                <label class="field"><span>Payment method</span><select id="salaryMethod"><option>Bank transfer</option><option>Cash</option><option>Cheque</option></select></label>
+              </div>
+              <div class="form-actions"><button class="button button-primary" type="submit">Record salary</button></div>
+            </form>
+            <div class="card"><div class="card-header"><div><h3>Salary register</h3><p>Paid and pending staff salaries.</p></div><input class="month-filter" id="salaryFilterMonth" type="month"></div><div class="table-wrap"><table><thead><tr><th>Teacher</th><th>Subject</th><th>Salary</th><th>Paid</th><th>Status</th></tr></thead><tbody id="salaryTable"></tbody></table></div></div>
+          </div>
+        </section>
+
+        <section class="page" id="page-books">
+          <div class="section-toolbar">
+            <div class="filter-row"><label class="search-control"><span>⌕</span><input id="bookSearch" type="search" placeholder="Search book, subject or teacher"></label><select id="bookClassFilter"></select></div>
+            <button class="button button-primary" id="addBookButton">+ Add book</button>
+          </div>
+          <div class="card"><div class="card-header table-title"><div><h3>Books and teaching assignments</h3><p>Class-wise subjects, textbooks and assigned teachers.</p></div></div><div class="table-wrap"><table><thead><tr><th>Class</th><th>Subject</th><th>Book title</th><th>Publisher</th><th>Assigned teacher</th><th>Actions</th></tr></thead><tbody id="booksTable"></tbody></table></div></div>
+        </section>
+
+        <section class="page" id="page-meetings">
+          <div class="section-toolbar"><div><h2 class="section-title">Teacher meetings</h2><p class="section-description">Schedule staff meetings and keep the agenda organized.</p></div><button class="button button-primary" id="addMeetingButton">+ Schedule meeting</button></div>
+          <div class="meeting-board" id="meetingBoard"></div>
+        </section>
+
+        <section class="page" id="page-reports">
+          <div class="report-hero">
+            <div><span class="eyebrow">SCHOOL ANALYTICS</span><h2>Reports center</h2><p>Review admissions, attendance, fee dues and staff records.</p></div>
+            <button class="button button-light" onclick="window.print()">Print current report</button>
+          </div>
+          <div class="report-tabs" role="tablist"><button class="active" data-report="dues">Student dues</button><button data-report="attendance">Attendance</button><button data-report="classes">Class strength</button><button data-report="payroll">Payroll</button></div>
+          <div class="card report-content" id="reportContent"></div>
+        </section>
+
+        <section class="page" id="page-settings">
+          <div class="settings-grid">
+            <form class="card form-card settings-card" id="schoolSettingsForm">
+              <div class="card-header"><div><h3>School profile</h3><p>Change the school name and academic year shown in the app.</p></div><span class="step-badge">Profile</span></div>
+              <div class="form-grid single">
+                <label class="field"><span>School name *</span><input id="settingsSchoolName" required maxlength="80"></label>
+                <label class="field"><span>Academic year *</span><input id="settingsAcademicYear" required maxlength="20" placeholder="2026–27"></label>
+              </div>
+              <div class="form-actions"><button class="button button-primary" type="submit">Save school profile</button></div>
+            </form>
+
+            <form class="card form-card settings-card" id="securitySettingsForm">
+              <div class="card-header"><div><h3>Owner login</h3><p>Change the username and PIN used to unlock this app.</p></div><span class="step-badge purple-badge">Security</span></div>
+              <div class="form-grid single">
+                <label class="field"><span>Owner username *</span><input id="settingsUsername" required maxlength="40"></label>
+                <label class="field"><span>New PIN *</span><input id="settingsPin" type="password" inputmode="numeric" required minlength="4" maxlength="12"></label>
+                <label class="field"><span>Confirm new PIN *</span><input id="settingsPinConfirm" type="password" inputmode="numeric" required minlength="4" maxlength="12"></label>
+              </div>
+              <div class="form-actions"><button class="button button-primary" type="submit">Update owner login</button></div>
+            </form>
+
+            <article class="card settings-card backup-card">
+              <div class="card-header"><div><h3>Backup folder and recovery</h3><p>Select a real phone folder where the app will keep your school database.</p></div><span class="step-badge amber-badge">Data</span></div>
+              <div class="backup-folder-status"><span class="backup-folder-icon">▣</span><div><small>Selected backup folder</small><strong id="backupFolderName">No folder selected</strong><span id="backupFolderHint">Choose a folder once, then every saved record will also be backed up there.</span></div></div>
+              <div class="backup-actions">
+                <button class="backup-action" id="chooseBackupFolder" type="button"><span class="quick-icon teal">＋</span><div><strong>Select backup folder</strong><small>Choose or create a folder in phone storage</small></div></button>
+                <button class="backup-action" id="saveBackupNow" type="button"><span class="quick-icon amber">↓</span><div><strong>Save backup now</strong><small>Update EduCore-School-Backup.json in the selected folder</small></div></button>
+                <button class="backup-action" id="restoreBackupFolder" type="button"><span class="quick-icon blue">↑</span><div><strong>Recover data from folder</strong><small>Select the old folder after reinstalling or changing phones</small></div></button>
+                <input id="backupFile" type="file" accept="application/json,.json" hidden>
+              </div>
+              <div class="backup-warning"><strong>Recovery protection</strong><span>The backup file stays in your chosen folder even if the app is removed. After reinstalling, use “Recover data from folder” and select the same folder.</span></div>
+            </article>
+
+            <article class="card settings-card device-card">
+              <div class="card-header"><div><h3>App information</h3><p>Owner-only school management edition.</p></div></div>
+              <div class="device-details">
+                <div><span>App version</span><strong>1.2.0</strong></div>
+                <div><span>Storage</span><strong>Phone storage + selected backup folder</strong></div>
+                <div><span>Internet permission</span><strong class="safe-text">Not requested</strong></div>
+                <div><span>Classes</span><strong>KG–10 • Sections A/B/C</strong></div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal" id="teacherModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="teacherModal"></div>
+    <form class="modal-card" id="teacherForm">
+      <div class="modal-header"><div><h3 id="teacherFormTitle">Add teacher</h3><p>Enter staff and salary information.</p></div><button type="button" class="modal-close" data-close-modal="teacherModal">×</button></div>
+      <input type="hidden" id="teacherEditId">
+      <div class="form-grid">
+        <label class="field field-wide"><span>Full name *</span><input id="teacherName" required></label>
+        <label class="field"><span>Subject *</span><input id="teacherSubject" required></label>
+        <label class="field"><span>Phone *</span><input id="teacherPhone" required></label>
+        <label class="field"><span>Email</span><input id="teacherEmail" type="email"></label>
+        <label class="field"><span>Monthly salary (PKR) *</span><input id="teacherSalary" type="number" min="0" required></label>
+        <label class="field"><span>Joining date *</span><input id="teacherJoinDate" type="date" required></label>
+      </div>
+      <div class="form-actions"><button type="button" class="button button-secondary" data-close-modal="teacherModal">Cancel</button><button class="button button-primary" type="submit">Save teacher</button></div>
+    </form>
+  </div>
+
+  <div class="modal" id="bookModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="bookModal"></div>
+    <form class="modal-card" id="bookForm">
+      <div class="modal-header"><div><h3 id="bookFormTitle">Add book assignment</h3><p>Connect a book and teacher with a class subject.</p></div><button type="button" class="modal-close" data-close-modal="bookModal">×</button></div>
+      <input type="hidden" id="bookEditId">
+      <div class="form-grid">
+        <label class="field"><span>Class *</span><select id="bookClass" required></select></label>
+        <label class="field"><span>Subject *</span><input id="bookSubject" required></label>
+        <label class="field field-wide"><span>Book title *</span><input id="bookTitle" required></label>
+        <label class="field"><span>Publisher</span><input id="bookPublisher"></label>
+        <label class="field"><span>Assigned teacher</span><select id="bookTeacher"></select></label>
+      </div>
+      <div class="form-actions"><button type="button" class="button button-secondary" data-close-modal="bookModal">Cancel</button><button class="button button-primary" type="submit">Save assignment</button></div>
+    </form>
+  </div>
+
+  <div class="modal" id="meetingModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="meetingModal"></div>
+    <form class="modal-card" id="meetingForm">
+      <div class="modal-header"><div><h3>Schedule teacher meeting</h3><p>Add the time, place and agenda.</p></div><button type="button" class="modal-close" data-close-modal="meetingModal">×</button></div>
+      <div class="form-grid">
+        <label class="field field-wide"><span>Meeting title *</span><input id="meetingTitle" required placeholder="e.g. Monthly staff review"></label>
+        <label class="field"><span>Date *</span><input id="meetingDate" type="date" required></label>
+        <label class="field"><span>Time *</span><input id="meetingTime" type="time" required></label>
+        <label class="field"><span>Location *</span><input id="meetingLocation" required placeholder="Conference room"></label>
+        <label class="field"><span>Participants</span><select id="meetingParticipants"><option>All teachers</option><option>Class teachers</option><option>Subject teachers</option><option>Management staff</option></select></label>
+        <label class="field field-full"><span>Agenda / notes</span><textarea id="meetingAgenda" rows="3"></textarea></label>
+      </div>
+      <div class="form-actions"><button type="button" class="button button-secondary" data-close-modal="meetingModal">Cancel</button><button class="button button-primary" type="submit">Schedule meeting</button></div>
+    </form>
+  </div>
+
+  <div class="modal" id="studentSearchModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="studentSearchModal"></div>
+    <div class="modal-card student-search-modal-card">
+      <div class="modal-header"><div><h3>Find a student</h3><p>Search by name or roll number, then filter by class and section.</p></div><button type="button" class="modal-close" data-close-modal="studentSearchModal">×</button></div>
+      <div class="student-search-controls">
+        <label class="field field-full"><span>Name or roll number</span><input id="studentLookupQuery" type="search" placeholder="Start typing a student name or roll number"></label>
+        <label class="field"><span>Class</span><select id="studentLookupClass"></select></label>
+        <label class="field"><span>Section</span><select id="studentLookupSection"><option value="">All sections</option><option>A</option><option>B</option><option>C</option></select></label>
+      </div>
+      <div class="student-lookup-results" id="studentLookupResults"></div>
+    </div>
+  </div>
+
+  <div class="modal receipt-modal" id="receiptModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-modal="receiptModal"></div>
+    <div class="modal-card receipt-modal-card">
+      <div class="modal-header receipt-screen-controls"><div><h3>Fee receipt</h3><p>Use the Android print screen to print or choose “Save as PDF”.</p></div><button type="button" class="modal-close" data-close-modal="receiptModal">×</button></div>
+      <div class="receipt-paper" id="receiptPaper"></div>
+      <div class="form-actions receipt-screen-controls"><button type="button" class="button button-secondary" data-close-modal="receiptModal">Close</button><button type="button" class="button button-primary" id="printReceiptButton">Save PDF / Print</button></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
